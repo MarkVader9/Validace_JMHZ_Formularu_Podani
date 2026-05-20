@@ -1,0 +1,24 @@
+Formát protokolu ProcessingResult pro ePodání JMHZ
+- Element Item s atributem subtype=“SOUHRN“ reprezentuje výsledek kontrol souhrnné vrstvy
+- Element Item s atributem subtype=“PVPOJ“ reprezentuje výsledek kontrol PVPOJ
+- Element Item s atributem subtype="FORM" reprezentuje výsledek kontrol individualizovaných formulářů
+o Pro individualizované formuláře je atribut „sqnr” vyplněn hodnotou vstupního elementu „idFormulare” pro napárování odpovědi na vstupní formulář.
+o Pro individualizované formuláře je atribut „identifier” vícehodnotový, a má formát „[ikMpsv];[idPpv]“ tj. hodnoty oddělené středníkem. Hodnoty budou vyplněny pouze v případě, že nebyly uvedeny ve vstupním formuláři. *** zvažujeme variantu plnit ikmpsv a idppv vždy
+
+<ProcessingResult type="CSSZ_JMHZ" version="1,0" result="OK" errMsg="" errNumber="0" count="3" countErr="0" countWar="0">
+              <Error>
+                            <RaisedBy></RaisedBy>
+                            <Number>0</Number>
+                            <Type>CSSZ_JMHZ</Type>
+                            <Text></Text>
+              </Error>
+              <Details>
+                            <Item sqnr="" identifier="" subtype=" " period="" result="OK" errMsg="" errNum="" />
+                            <Item sqnr="" identifier="" subtype="SOUHRN" period="" result="OK" errMsg="" errNum="" />
+                            <Item sqnr="" identifier="" subtype="PVPOJ" period="" result="OK" errMsg="" errNum="" />
+                            <Item sqnr="ecfb724d-5deb-4b77-94d1-624261b04db4“ identifier="" subtype="FORM" period="" result="OK" errMsg="" errNum="" />
+                            <Item sqnr="89aefe89-9135-4fbc-867a-8413b6705540" identifier="" FORM" period="" result="OK" errMsg="" errNum="" />
+                            <Item sqnr="59c8ebff-01a7-4886-b0f8-cde7ef4598ee" identifier="4897834263;24234234" subtype=" FORM" period="" result="OK" errMsg="" errNum="" />
+                            <Item sqnr="37fd2c40-6299-44ef-9bf7-a166a1158c26" identifier="" subtype=" FORM" period="" result="ERROR" errMsg="JMHZ25_LT: 20118 - Chybná hodnota výše sociálního pojištění; 20119 - Chybná hodnota výše zdravotního pojištění" errNum="20118" />
+              </Details>
+</ProcessingResult>
