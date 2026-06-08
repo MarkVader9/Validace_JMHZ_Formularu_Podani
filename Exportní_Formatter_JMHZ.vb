@@ -1,13 +1,6 @@
  
 Option Explicit
-Private Declare Function CoCreateGuid Lib "ole32.dll" (ByRef pGuid As GUID) As Long
-Private Declare Function StringFromGUID2 Lib "ole32.dll" (ByRef rguid As GUID, ByVal lpStrGuid As Long, ByVal cbMax As Long) As Long
-Private Type GUID
-    Data1 As Long
-    Data2 As Integer
-    Data3 As Integer
-    Data4(7) As Byte
-End Type
+
 
 
 
@@ -198,24 +191,18 @@ Dim SocELDPDo As Date
 Dim SocELDPOd3(3) As Date
 Dim SocELDPDo3(3) As Date
 Dim DNPnahr(3) As Integer
-
-
-
 Private Sub START_CYKLU_ZAMESTNANCE()
 i = i + 1: T(i) = "<            START CYKLU ZAMĚSTNANCE"
 i = i + 1: T(i) = String(156, "*")
 
 If CoPoslat = 1 Then
- If ResultText(2) = "JedenZam" Then:
-  If PismenoCo = "R" Then
+  If (PismenoCo = "R" And (Check8.Value = 2 Or Check7.Value = 0)) And Check6.Value = 0 Then
     M10012 = CreateGUID: i = i + 1: T(i) = ">>>  " + M10012
+    M10012 = Mid(M10012, 1, 36)
     Text4 = M10012
-    P(642) = M10001
     P(643) = M10012:
     P(644) = "R"
-   
   Else
-    Text3 = P(642)
     Text4 = P(643)
   End If
 End If
@@ -259,7 +246,7 @@ i = i + 1: T(i) = " J Mezinárodní pronájem pracovní síly – zaměstnanec f
  If Trim(Mid(O(327), 1, 1)) = "F" Then: formTag = "ozpTpp"
  If Trim(Mid(O(327), 1, 1)) = "G" Then: formTag = ""
  If Trim(Mid(O(327), 1, 1)) = "H" Then: formTag = "odlozenyPrijem": M10548 = Mid(O(327), 3, 1)
- If Mid(O(269), 1, 1) = "Q" Then: formTag = "cinnostKS"
+ If Mid(O(269), 1, 1) = "Q" Or Mid(O(269), 1, 1) = "O" Then: formTag = "cinnostKS"
  If Trim(Mid(O(327), 1, 1)) = "I" Then: formTag = "cinnostKS"
  If Trim(Mid(O(269), 1, 2)) = "14" Then: formTag = "jinyPrijem"
  SpecSkupina = Mid(O(269), 1, 1)
@@ -398,7 +385,7 @@ i = i + 1: T(i) = String(156, "*")
  If O(320) = "Dohoda o prov.p" And M(202) <= DPPHranice Then: NepojistCinnost = True
  If O(320) = "Dohoda o čin." And M(202) < CMRMax Then: NepojistCinnost = True
 
-M10286 = Trim(Str(M(260) + M(414))): i = i + 1: T(i) = ">>>  " + M10286 + " = M260 +  M414"
+M10286 = Trim(Str(M(260) + M(409) + M(540) + M(289) + M(394) + M(427) + M(257) + M(424) + M(423) + M(426))): i = i + 1: T(i) = ">>>  " + M10286 + " = M260 +  M289 + M427 + M257 + M424 + M423 + M395 + M426"
 i = i + 1: T(i) = "10286 Zúčtovaný příjem - celkem"
 i = i + 1: T(i) = " Zúčtovaný příjem od zaměstnavatele, tj. včetně příjmů osvobozených a příjmů podléhajících dani vybírané srážkou podlezvláštní sazby daně. I v případě nulových zúčtovaných příjmů musí být uvedena nula."
 i = i + 1: T(i) = String(195, "-")
@@ -408,28 +395,31 @@ i = i + 1: T(i) = "10416 Zúčtovaný příjem - z toho odměny členů orgánů
 i = i + 1: T(i) = " "
 i = i + 1: T(i) = String(195, "-")
 
-M10289 = Trim(Str(M(260) + M(414) - M(284))): i = i + 1: T(i) = ">>>  " + M10289 + " = M260 + M414 - M284"
+M10289 = Trim(Str(M(260) - M(284) + M(417) + M(540) + M(409) + M(289) + M(394) + M(427) + M(257) + M(424) + M(423) + M(426))): i = i + 1: T(i) = ">>>  " + M10289 + " = M260 - M284 + M289 + M427 + M257 + M424 + M423 + M395 + M426"
+'MsgBox (M10289)
+
 i = i + 1: T(i) = "10289 Osvobozené příjmy ze zúčtovaných příjmů - celkem"
 i = i + 1: T(i) = " Částka – úhrn osvobozených příjmů (např. příspěvky zaměstnavatele na produkty na stáří). Zde úhrn všech osvobozených příjmů nejen podle § 6 odst. 9, ale také např. § 4a ZDP. Samozřejmě u příjmů, kde není povinnost rozúčtovávat na jednotlivé zaměstnance (např. § 6 odst. 9 písmeno g) ZDP ty uvádět není povinné)"
 i = i + 1: T(i) = String(195, "-")
-
-M10417 = Replace(P(620), ",", "."): i = i + 1: T(i) = ">>>  " + M10417 + " = O620 viz Okno P111"
+ '    If Trim(ZOsCislo) = "18" Then: MsgBox (ZPrijmeni & " 1 " & M10289)
+ 
+M10417 = Trim(Str(M(289) + M(394) + M(427) + M(257) + M(424) + M(423) + M(395) + M(426))): i = i + 1: T(i) = ">>>  " + M10417 + " = M289 + M427 + M257 + M424 + M423  + M395 + M426"
 If Trim(M10417) = "" Then: M10417 = "0"
 i = i + 1: T(i) = "10417 Příspěvek zaměstnavatele na produkty spoření na stáří a pojištění dlouhodobé péče z osvobozených příjmů - celkem"
 i = i + 1: T(i) = " Bez náplně jen popis k níže uvedeným položkám § 15a ZDP"
 i = i + 1: T(i) = String(195, "-")
 
-M10418 = Trim(Str(M(426))): i = i + 1: T(i) = ">>>  " + M10418 + " = M426  viz okno M540 "
+M10418 = Trim(Str(M(427))): i = i + 1: T(i) = ">>>  " + M10418 + " = M427  viz okno M540 "
 i = i + 1: T(i) = "10418 Příspěvek na pojištění dlouhodobé péče"
 i = i + 1: T(i) = " Částka – osvobozeného příjmu podle § 6 odst. 9 písm. m) ZDP dle jednotlivého produktu."
 i = i + 1: T(i) = String(195, "-")
 
-M10292 = Trim(Str(M(257))): i = i + 1: T(i) = ">>>  " + M10292 + " = M257  viz okno M460"
+M10292 = Trim(Str(M(257) + M(424))): i = i + 1: T(i) = ">>>  " + M10292 + " = M257  viz okno M460"
 i = i + 1: T(i) = "10292 Příspěvek na penzijní připojištění se státním příspěvkem"
 i = i + 1: T(i) = " Částka – osvobozeného příjmu podle § 6 odst. 9 písm. m) ZDP dle jednotlivých produktů"
 i = i + 1: T(i) = String(195, "-")
 
-M10293 = Trim(Str(M(241))): i = i + 1: T(i) = ">>>  " + M10293 + " = M241  viz okno M460"
+M10293 = Trim(Str(M(423))): i = i + 1: T(i) = ">>>  " + M10293 + " = M423  viz okno M460"
 i = i + 1: T(i) = "10293 Příspěvek na doplňkové penzijní spoření"
 i = i + 1: T(i) = " Částka – osvobozeného příjmu podle § 6 odst. 9 písm. m) ZDP dle jednotlivého produktu"
 i = i + 1: T(i) = String(195, "-")
@@ -439,12 +429,12 @@ i = i + 1: T(i) = "10294 Příspěvek na penzijní pojištění"
 i = i + 1: T(i) = " Částka – osvobozeného příjmu podle § 6 odst. 9 písm. m) ZDP dle jednotlivého produktu"
 i = i + 1: T(i) = String(195, "-")
 
-M10295 = Trim(Str(M(395))): i = i + 1: T(i) = ">>>  " + M10295 + " = M395  viz okno M460"
+M10295 = Trim(Str(M(394))): i = i + 1: T(i) = ">>>  " + M10295 + " = M395  viz okno M460"
 i = i + 1: T(i) = "10295 Příspěvek na soukromé životní pojištění"
 i = i + 1: T(i) = " Částka – osvobozeného příjmu podle § 6 odst. 9 písm. m) ZDP dle jednotlivého produktu"
 i = i + 1: T(i) = String(195, "-")
 
-M10296 = Trim(Str(M(425))): i = i + 1: T(i) = ">>>  " + M10296 + " = M425  viz okno M460"
+M10296 = Trim(Str(M(426))): i = i + 1: T(i) = ">>>  " + M10296 + " = M426  viz okno M460"
 i = i + 1: T(i) = "10296 Příspěvek na dlouhodobý investiční produkt"
 i = i + 1: T(i) = " Částka – osvobozeného příjmu podle § 6 odst. 9 písm. m) ZDP dle jednotlivého produktu."
 i = i + 1: T(i) = String(195, "-")
@@ -454,7 +444,8 @@ i = i + 1: T(i) = "<            ZÁLOHOVÁ DAŇ"
 i = i + 1: T(i) = String(156, "*")
 
 'M10297 = "0"
-If M(280) > 0 Then: M10297 = Trim(Str(M(284))):
+'If M(280) > 0 Then:
+M10297 = Trim(Str(M(284))):
 'If M(388) = 0 Then: M10297 = Trim(Str(M(285)))
 
 i = i + 1: T(i) = ">>>  " + M10297 + " = M388 a M285 > 0  viz okno M290"
@@ -537,8 +528,7 @@ i = i + 1: T(i) = "10301 Rozšířená sleva na invaliditu (III. Stupeň)"
 i = i + 1: T(i) = " Částka podle § 35ba odst. 1 písmeno d) ZDP – 1/12 rozšířené slevy na invaliditu (tj. pro rok 2024 částka 420 Kč měsíčně), pokud byl zaměstnanci přiznán invalidní důchod pro invaliditu III. stupně nebo jiný důchod z důchodového pojištění podle zákona o důchodovém pojištění, u něhož jednou z podmínek přiznání je, že je invalidní ve III. stupni, zanikl-li nárok na plný invalidní důchod z důvodu souběhu nároku na výplatu invalidního důchodu pro invaliditu III. stupně a starobního důchodu nebo je poplatník podle zvláštních předpisů plně invalidní, avšak jeho žádost o plný invalidní důchod byla zamítnuta z jiných důvodů než proto, že není plně invalidní. Pokud zaměstnanec učinil prohlášení k dani a slevu v něm uplatňuje."
 i = i + 1: T(i) = String(195, "-")
 
-If O(230) = "ZTP-P" Then: M10302 = Trim(Str(M(315)))
-M10300 = "": M10301 = "": i = i + 1: T(i) = ">>>  " + M10302 + " = M315   závislost na položce O230  viz okno M290"
+If O(230) = "ZTP-P" Then: M10302 = Trim(Str(M(315))): M10300 = "": M10301 = "": i = i + 1: T(i) = ">>>  " + M10302 + " = M315   závislost na položce O230  viz okno M290"
 i = i + 1: T(i) = "10302 Sleva na držitele průkazu ZTP/P"
 i = i + 1: T(i) = " Poplatník má nárok na slevu na dani ve výši 1 345 Kč měsíčně (což odpovídá 1/12 slevy roční 16 140 Kč podle § 35ba odst. 1 písm. e) ZDP), a to za každý měsíc, ve kterém byly splněny následující podmínky:"
 i = i + 1: T(i) = " k prvnímu dni měsíce mu byl přiznán nárok na průkaz ZTP/P (rozhodující je datum uvedené v rozhodnutí o přiznání nároku – průkaz samotný ještě být vydaný nemusí),"
@@ -548,7 +538,7 @@ i = i + 1: T(i) = " od nástupu do zaměstnání, pokud zaměstnanec doloží ro
 i = i + 1: T(i) = " nebo od měsíce následujícího po předložení rozhodnutí, pokud je nárok doložen později v průběhu roku"
 i = i + 1: T(i) = " Dodatečně lze k nároku přihlédnout i v ročním zúčtování, pokud zaměstnanec doloží rozhodné skutečnosti zpětně – za měsíce, kdy měl nárok přiznaný k 1. dni měsíce, ale zaměstnavatel o tom v danou dobu nevěděl."
 i = i + 1: T(i) = String(195, "-")
-        
+  
 c = 0: op = 0
 For b = 271 To 279
 op = op + 2
@@ -646,7 +636,7 @@ For b = 200 To 216 Step 2
   If c = 1 Then: i = i + 1: T(i) = " Vyplní se pořadí dítěte v rámci jedné společně hospodařící domácnosti dle § 35c ZDP, na které je uplatňováno daňové zvýhodnění. Jedná se o číselnou hodnotu, a to na jedno dítě „1.“ na druhé dítě „2.“, na třetí a každé další vyživované dítě „3.“ Poplatník si sám určuje pořadí dítěte. Pořadí nemusí být chronologické. Pokud poplatník na dítě žijící ve stejné společně hospodařící domácnosti neuplatňuje daňové zvýhodnění, musí je uvést s pořadím a kódem ‚N‘."
   If c = 1 Then: i = i + 1: T(i) = " Platí, že pokud poplatník v konkrétním měsíci uplatňuje daňové zvýhodnění na dítě s pořadím vyšším než 1. (tj. „2.“ nebo „3.“), musí být zároveň uvedeno dítě s nižším pořadím (např. pořadí „1.“), které žije ve stejné společně hospodařící domácnosti, a to i v případě, že na toto dítě není uplatňováno daňové zvýhodnění – pak musí být uvedeno s pořadím N (neuplatňuje)."
   i = i + 1: T(i) = String(195, "-")
-
+'MsgBox (M10435(c) & "  " & M10440(c))
  End If
 
 Next b
@@ -704,7 +694,7 @@ i = i + 1: T(i) = "10319 Zaměstnanec požádal o provedení ročního zúčtov�
 i = i + 1: T(i) = " Zaškrtnuta varianta ANO - žádost zaměstnance o provedení roční zúčtování záloh za období r-1. Zaškrtnuta varianta NE - nebylo požadováno roční zúčtování zaměstnancem."
 i = i + 1: T(i) = String(195, "-")
 
-If M(465) > 0 Then: M10320 = True: s = "ANO": Else: M10320 = False: s = "NE"
+If M(465) <> 0 Then: M10320 = True: s = "ANO": Else: M10320 = False: s = "NE"
 i = i + 1: T(i) = ">>>  " + Str(M10320) + " = M465 > 0  viz okno M290"
 i = i + 1: T(i) = "10320 Roční zúčtování záloh bylo provedeno"
 i = i + 1: T(i) = " Zaškrtnuta varianta ANO - bylo provedeno roční zúčtování zaměstnavatelem. Zaškrtnuta varianta NE - nebylo provedeno roční zúčtování zaměstnavatelem."
@@ -834,11 +824,12 @@ For b = 200 To 216 Step 2
        i = i + 1: T(i) = " Rodné číslo vyživovaného dítěte poplatníka (manžela nebo registrovaného partnera podle zákona o registrovaném partnerství), které nedovršilo věku 3 let (na rozdíl od daňového zvýhodnění na děti nelze uvést vnuka vlastního ani vnuka druhého z manželů pokud není v péči těchto osob, která nahrazuje péči rodičů)."
        i = i + 1: T(i) = String(195, "-")
 
-      If O(270 + c) = "1" Or O(270 + c) = "2" Or O(270 + c) = "3" Then: M10454 = True: s = "ANO"
- 
+      If Trim(O(270 + c)) = "1" Or Trim(O(270 + c)) = "2" Or Trim(O(270 + c)) = "3" Then: M10454 = True: s = "ANO"
+ 'MsgBox (Trim(O(270 + c)))
     End If
    End If
 Next b
+
 PocDetiPartnera(1) = 1
 i = i + 1: T(i) = "<        Ostatní osoby a vyživované děti v rámci RZD"
 i = i + 1: T(i) = String(156, "*")
@@ -1225,19 +1216,19 @@ i = i + 1: T(i) = String(156, "*")
 Call NactiStrediskoPodleNazvu(ZStredisko)
 If Trim(Obec) = "" Then: Obec = FirmaAdrObec: KodObec = M10230: Stat = FirmaStat:
 
-M10229 = Obec: i = i + 1: T(i) = ">>>  " + Obec + " - zadává se adresa do Služby/Střediska. Pokud není zadáno použije se adresa firmy"
+M10229 = Trim(Obec): i = i + 1: T(i) = ">>>  " + Obec + " - zadává se adresa do Služby/Střediska. Pokud není zadáno použije se adresa firmy"
 i = i + 1: T(i) = "10229 Obec"
 i = i + 1: T(i) = " Uvede se obec, na jejímž území výkon práce probíhal. Pokud v daném měsíci místo výkonu práce bylo umístěno ve více obcích, pak se uvede obec, kde výkon práce probíhal převážně nebo obec kde je umístěna provozovna, v níž zaměstnanec zahajoval práci. K záznamu se využije číselník obcí (CISOB), který je v databázi ČSÚ uložen pod názvem „Obec a vojenský újezd“. V případě, že v daném měsíci výkon práce probíhal převážně mimo ČR, ale i v ČR, uvede se obec v ČR."
 i = i + 1: T(i) = " V případě, že místo výkonu bylo umístěno pouze mimo území ČR, vyplní se obec bez vazby na uvedený číselník."
 i = i + 1: T(i) = String(195, "-")
 
-M10230 = KodObec: i = i + 1: T(i) = ">>>  " + KodObec + " - zadává se adresa do Služby/Střediska. Pokud není zadáno použije se adresa firmy, zkontrolujte je-li vyplněna."
+M10230 = Trim(KodObec): i = i + 1: T(i) = ">>>  " + KodObec + " - zadává se adresa do Služby/Střediska. Pokud není zadáno použije se adresa firmy, zkontrolujte je-li vyplněna."
 i = i + 1: T(i) = "10230 Kód obce"
 i = i + 1: T(i) = " Uvede se příslušný kód obce (místa výkonu práce) z číselníku obcí (CISOB), který je v databázi ČSÚ uložen pod názvem „Obec a vojenský újezd“"
 i = i + 1: T(i) = " V případě, že výkon práce probíhal výhradně mimo území ČR, kód se neuvádí."
 i = i + 1: T(i) = String(195, "-")
 
-M10231 = Stat: i = i + 1: T(i) = ">>>  " + Stat + " - zadává se adresa do Služby/Střediska. Pokud není zadáno použije se adresa firmy"
+M10231 = Trim(Stat): i = i + 1: T(i) = ">>>  " + Stat + " - zadává se adresa do Služby/Střediska. Pokud není zadáno použije se adresa firmy"
 i = i + 1: T(i) = "10231 Stát"
 i = i + 1: T(i) = " Vyplňuje se v případě, že místo výkonu práce bylo umístěno výhradně mimo území ČR, resp. v případě, kdy není uveden kód obce."
 i = i + 1: T(i) = " K záznamu se využije číselník zemí (CZEM), který je dostupný v databázi metainformací. "
@@ -1460,8 +1451,8 @@ End If
 
 M10265 = Trim(Str(Abs(DateDiff("d", DatOd, DatDo) + 1 - M(77))))
    '     MsgBox (ZPrijmeni & " " & M10265 & " " & DatOd & " " & DatDo)
-If Trim(ZOsCislo) = "769" Then: MsgBox (ZPrijmeni & " " & M10265 & " " & DatOd & " " & DatDo)
-
+'If Trim(ZOsCislo) = "769" Then: MsgBox (ZPrijmeni & " " & M10265 & " " & DatOd & " " & DatDo)
+  
 
 If Mid(M10265, 1, 1) = "." Then: M10265 = "0" + M10265
 i = i + 1: T(i) = ">>>  " + M10265 + " = počet dnů aktuálního měsíce mezi O310 a O340"
@@ -1479,15 +1470,15 @@ i = i + 1: T(i) = "<            Neodpracované hodiny"
 i = i + 1: T(i) = String(156, "*")
 
 
-M10276 = Trim(Str(M(60) + M(86) + M(80) + M(81) + M(84) + M(90) + M(92) + M(93) + M(95) + M(36)))
-If O(320) = "Uvolnění" Then: M10276 = Trim(Str(M(86) + M(80) + M(81) + M(84) + M(90) + M(92) + M(93) + M(95) + M(36)))
+M10276 = Trim(Str(M(60) + M(86) + M(80) + M(81) + M(84) + M(92) + M(93) + M(95) + M(36)))
+If O(320) = "Uvolnění" Then: M10276 = Trim(Str(M(86) + M(80) + M(81) + M(84) + M(92) + M(93) + M(95) + M(36)))
 If Mid(M10276, 1, 1) = "." Then: M10276 = "0" + M10276
 i = i + 1: T(i) = ">>>  " + M10276 + " = M86 + M80 + M81 + M84 + M90 + M92 + M93 + M95 + M36"
 i = i + 1: T(i) = "10276 Počet neodpracovaných hodin s náhradou či nekrácením mzdy"
 i = i + 1: T(i) = " Uvede se počet neodpracovaných hodin s náhradou či nekrácením mzdy/platu/odměny z dohody v měsíci (z celkového počtu neodpracovaných hodin). Zahrnou se neodpracované hodiny s náhradou mzdy/platu/odměny z dohody z důvodu dovolené, svátků v jinak pracovní dny (zahrnují se i neodpracované hodiny, kdy se měsíční mzda nekrátí), důležitých překážek v práci na straně zaměstnance (ZP § 199, nařízení vlády č. 590/2006 Sb.), překážek v práci z důvodu obecného zájmu (ZP § 200, 203, 203a, 205) a překážek v práci na straně zaměstnavatele (ZP § 207 až 210). Rovněž se zahrnou tzv. sick days (indispoziční volno) a „osobní volno“ stanovené vnitřním předpisem zaměstnavatele jako zaměstnanecký benefit, a to jak s náhradou mzdy/platu, tak placené měsíční mzdou/platu bez jejího krácení. Neuvádí se hodiny neodpracované z důvodu dočasné pracovní neschopnosti a ošetřování člena rodiny."
 i = i + 1: T(i) = String(195, "-")
  
-M10277 = Trim(Str((M(66) - M(610) + PocNahrNSoNe - M(626) - M(627) - M(628)) * Val(P(23)))):
+M10277 = Trim(Str(M(90) + (M(66) - M(610) + PocNahrNSoNe - M(626) - M(627) - M(628)) * Val(P(23)))):
 'MsgBox (M10277 & " - " & PocNahrNSoNe & " - " & M(626) & " - " & M(627) & " - " & M(628) & " - " & M(610))
 If Mid(M10277, 1, 1) = "." Then: M10277 = "0" + M10277
 i = i + 1: T(i) = ">>>  " + M10280 + " = (M66 - (M624 + M626 + M627 + M628 'soboty neděle')) * Val(P(23)"
@@ -1626,7 +1617,7 @@ i = i + 1: T(i) = "<             Příplatky   "
 i = i + 1: T(i) = String(156, "*")
  
 'M10332 = Trim(Str(M(140) + M(132) + M(128) + M(112) + M(113) + M(122) + M(123) + M(125) + M(126) + M(127) + M(134) + M(205) + M(206) + M(207) + M(208)))
-M10332 = Trim(Str(M(121) - M(130) - M(481) - M(148) - M(142) - M(143) + M(384) + M(154) + M(153) + M(217)))
+M10332 = Trim(Str(M(121) - M(130) - M(481) - M(148) - M(142) - M(143) + M(384) + M(154) + M(153)))
 
 i = i + 1: T(i) = ">>>  " + M10332 + " = M121 - M130 - M481 + M384 + M154 + M153 + M217 + M112 + M113"
 i = i + 1: T(i) = "10332 Příplatky celkem"
@@ -4205,7 +4196,6 @@ If SysMes <= 3 Then
   i = i + 1: T(i) = "10036 Úhrn přeplatků na dani a nedoplatků daně z ročního zúčtování"
   i = i + 1: T(i) = " Přeplatek z ročního zúčtování záloh na daň za příslušné zdaňovací období. (pozn. v současném tiskopise výpočet daně vzor č. 29 se jedná o úhrn řádků 23 + 31)"
   i = i + 1: T(i) = String(198, " - ")
-
  ' RZDBonus = M(364)
   M10037 = Str(RZDBonus) 'Leden/Únor/Březen měsíční hlášení
   i = i + 1: T(i) = ">>>  " + M10037 + " = M364 součet za všechny letošní měsíce  viz okno M290"
@@ -4356,7 +4346,7 @@ If CoPoslat = 1 Then
 
 
    UtvorJMHZ_XML
-   
+    If s = "end" Then: Exit Sub
    NactiUhrny
   ' Exit Sub
    a = a + 1: txt(a) = "----Souhrná část - Daně -----"
@@ -4391,19 +4381,11 @@ OsobC = ZOsCislo
  NactiZamestnavatele
  JMHZ_ULOZIT
  'Nacti_F10001
- 'MsgBox ("X" & Radne & "X")
+' MsgBox ("X" & Radne & "X")
  Command16.Visible = True
  'If Radne = "R" And FirmaIco = "49905431" Then: MsgBox ("Tůdle "): Command16.Visible = False: Exit Sub
  
- If PismenoCo = "R" And Check6 = "0" And CoPoslat = 1 Then
-      Msg = "Řádné xml pro tento měsíc již bylo vytvořeno! Bylo i přijato e-portálem nebo bylo stornováno? A/N (N vytvoří ŘÁDNÉ xml znovu)"
-          MsgOtaznik
-          If Odpoved = vbYes Then
-               MsgBox "Přerušuji tvorbu xml! ":
-               Command16.Visible = False
-              Exit Sub
-          End If
- End If
+
  
  PocZam = 0
  UlozJMHZ
@@ -4415,11 +4397,12 @@ OsobC = ZOsCislo
   NahrajZam (ZOsCislo)
   If Mid(LicenceCis, 11, 8) = IcoZitkova And O(328) = "Ano" Then: GoTo PreskocZam
   'If O(328) = "Ano" Then: GoTo PreskocZam
-   Command16.Caption = Space(10 - Len(Trim(ZOsCislo))) & Trim(ZOsCislo) & " " & Trim(ZPrijmeni) + " " + Trim(ZJmeno)
+  xxx = xxx + 1
+   Command16.Caption = Str(xxx) + Space(10 - Len(Trim(ZOsCislo))) & Trim(ZOsCislo) & " " & Trim(ZPrijmeni) + " " + Trim(ZJmeno)
      
         If CoPoslat = 1 Then: NaplnZamestnance
         If CoPoslat = 2 Then: NactiRegistraciZamestnancu
-           xxx = xxx + 1
+           
      If CoPoslat = 1 Then  ' měsíční zaměstnanec
        If xx1 = a Then: a = a - 1
        a = a + 1: txt(a) = Space(10 - Len(Trim(ZOsCislo))) & Trim(ZOsCislo) & vbTab & Trim(ZPrijmeni) + " " + Trim(ZJmeno): xx1 = a
@@ -4472,13 +4455,19 @@ Skokk:
     Print #5, "    </employees>"
    Print #5, "</REGZEC>"
     Close #5
-   
+     
   End If
   
 Ss:
 Label2.Visible = False
 ProgressBar1.Visible = False
-MsgBox ("Soubor XML " & FVystup & " je vytvořen!")
+If PismenoCo = "R" And Check6.Value = 0 Then
+   MsgBox "Soubor XML " & FVystup & " je vytvořen! " & vbCrLf & vbCrLf & "Po přijetí hlášení na e-portálu proveďte archivaci měsíce!" & vbCrLf & vbCrLf & " Uložíte tím právě vytvořený originální GUID."
+Else
+   MsgBox ("Soubor XML " & FVystup & " je vytvořen!")
+End If
+   
+   
 TiskniJMHZ
 End Sub
 Private Sub TiskniJMHZ()
@@ -4669,11 +4658,32 @@ Private Sub Command18_Click(Index As Integer)
 If ResultText(2) = "JedenZam" And HromA1 = 0 Then
      NactiOpravy
 Else
+
+
+'If PismenoCo = "R" And Radne = "R" And Check6 = "0" And CoPoslat = 1 Then
+ 'Frame4.Visible = True
+  'Option3(0).Value = 1
+  'If Option3(0).Value = 1 Then:
+'      Msg = "Řádné xml pro tento měsíc již bylo vytvořeno!" & vbCrLf & vbCrLf & " Bylo i přijato e-portálem nebo bylo stornováno? " & vbCrLf & "                             A/N" & vbCrLf & vbCrLf & "                 (N vytvoří ŘÁDNÉ xml znovu)"
+'          MsgOtaznik
+'          If Odpoved = vbYes Then
+'               MsgBox "Přerušuji tvorbu xml! ":
+'               Command16.Visible = False
+'              Exit Sub
+'          End If
+'End If
+
+
 s = Mid(mesicStr(SysMes), 1, 3)
 If SysMes = 6 Then: s = "Čvn"
 If SysMes = 7 Then: s = "Čvc"
+ If Check6.Value = 0 Then
+  If Cast = 0 Then: FVystup = PathXml & "\MH-" & s & Mid(Trim(Str(SysRok)), 3, 2) & "-" & Mid(FirmaZkratka, 1, 6) & Replace(Now, ":", "") & ".xml"
+ Else
+   If Cast = 0 Then: FVystup = PathXml & "\MH-Test.xml"
 
-  If Cast = 0 Then: FVystup = PathXml & "\MH-" & s & Mid(Trim(Str(SysRok)), 3, 2) & "-" & FirmaZkratka & Replace(Now, ":", "") & ".xml"
+ End If
+  
   If Cast = 1 Then:
       NactiJMHZ
 End If
@@ -4802,11 +4812,16 @@ End Sub
 Private Sub UtvorJMHZ_XML()
 
 If CoPoslat = 1 Then
-  If PismenoCo = "R" Then
+  If (PismenoCo = "R" And (Check8.Value = 2 Or Check7.Value = 0)) And Check6.Value = 0 Then
     M10001 = CreateGUID
-    Uloz_F10001
+    M10001 = Mid(M10001, 1, 36)
+    Text3 = M10001
+    Uloz_F10001A
   Else
     M10001 = Text3
+     If Check6.Value = 0 Then
+        If PismenoCo = "R" Then: MsgBox ("Vaše Řádné podání je již na e-portálu. Vytvořit můžete pouze Opravné nebo Storno!"): ProgressBar1.Visible = False: s = "end": Exit Sub
+     End If
   End If
 End If
 
@@ -4883,7 +4898,7 @@ Print #3, "      <so:danBonus>" & SafeTrim(M10035) & "</so:danBonus>" ' Suma mě
 Print #3, "    </so:danUdajeMesic>"
 
 ' SCÉNÁŘ RZD: Roční daňové údaje (pouze v měsících 01-03)
-If M10010 >= 1 And M10010 <= 3 And SysRok > 2026 Then
+If M10010 >= 1 And M10010 <= 3 Then
     Print #3, "    <so:danUdajeRok>"
     Print #3, "      <so:danPreplatek>" & SafeTrim(M10036) & "</so:danPreplatek>" ' Úhrn přeplatků z RZD
     Print #3, "      <so:danBonusDoplatek>" & SafeTrim(M10037) & "</so:danBonusDoplatek>" ' Úhrn doplatků bonusů z RZD
@@ -4963,10 +4978,10 @@ Print #3, "    <pvpoj:pojistne>"
 ' Rozpad dle kategorií záchranářů a rizik (A, B, C)
 Print #3, "      <pvpoj:zakladZamestnavateleA>" & SafeTrim(M10023) & "</pvpoj:zakladZamestnavateleA>" ' Základ standardní (sazba 24,8 %)
 Print #3, "      <pvpoj:pojistneZamestnavateleA>" & SafeTrim(M10024) & "</pvpoj:pojistneZamestnavateleA>" ' Výše pojistného kategorie A
-Print #3, "      <pvpoj:zakladZamestnavateleB>" & SafeTrim(M10025) & "</pvpoj:zakladZamestnavateleB>" ' Základ záchranáři/členové HZS
-Print #3, "      <pvpoj:pojistneZamestnavateleB>" & SafeTrim(M10026) & "</pvpoj:pojistneZamestnavateleB>" ' Výše pojistného kategorie B (sazba 29,8 %)
-Print #3, "      <pvpoj:zakladZamestnavateleC>" & SafeTrim(M10483) & "</pvpoj:zakladZamestnavateleC>" ' Základ riziková práce
-Print #3, "      <pvpoj:pojistneZamestnavateleC>" & SafeTrim(M10484) & "</pvpoj:pojistneZamestnavateleC>" ' Výše pojistného kategorie C (sazba 26,8 %+)
+If Val(SafeTrim(M10025)) > 0 Or Val(SafeTrim(M10023)) + Val(SafeTrim(M10026)) + Val(SafeTrim(M10483)) = 0 Then: Print #3, "      <pvpoj:zakladZamestnavateleB>" & SafeTrim(M10025) & "</pvpoj:zakladZamestnavateleB>" ' Základ záchranáři/členové HZS
+If Val(SafeTrim(M10026)) > 0 Then: Print #3, "      <pvpoj:pojistneZamestnavateleB>" & SafeTrim(M10026) & "</pvpoj:pojistneZamestnavateleB>" ' Výše pojistného kategorie B (sazba 29,8 %)
+If Val(SafeTrim(M10483)) > 0 Or Val(SafeTrim(M10023)) + Val(SafeTrim(M10026)) + Val(SafeTrim(M10483)) = 0 Then: Print #3, "      <pvpoj:zakladZamestnavateleC>" & SafeTrim(M10483) & "</pvpoj:zakladZamestnavateleC>" ' Základ riziková práce
+If Val(SafeTrim(M10484)) > 0 Then: Print #3, "      <pvpoj:pojistneZamestnavateleC>" & SafeTrim(M10484) & "</pvpoj:pojistneZamestnavateleC>" ' Výše pojistného kategorie C (sazba 26,8 %+)
 ' Sumární součty celého pojistného
 Print #3, "      <pvpoj:pojistneZamestnavateleCelkem>" & SafeTrim(M10027) & "</pvpoj:pojistneZamestnavateleCelkem>" ' Součet A + B + C
 Print #3, "      <pvpoj:pojistneZamestnance>" & SafeTrim(M10028) & "</pvpoj:pojistneZamestnance>" ' Úhrn sraženého pojistného ZC (sazba 7,1 %)
@@ -5008,8 +5023,12 @@ Private Sub UtvorPVPOJ_XML()
 Print #3, "  <pvpoj:PVPOJ>"
 Print #3, "    <pvpoj:pojistne>"
 ' Rozpad dle kategorií záchranářů a rizik (A, B, C)
-Print #3, "      <pvpoj:zakladZamestnavateleA>" & "0" & "</pvpoj:zakladZamestnavateleA>" ' Základ standardní (sazba 24,8 %)
-Print #3, "      <pvpoj:pojistneZamestnavateleA>" & "0" & "</pvpoj:pojistneZamestnavateleA>" ' Výše pojistného kategorie A
+Print #3, "      <pvpoj:zakladZamestnavateleA>" & SafeTrim(M10023) & "</pvpoj:zakladZamestnavateleA>" ' Základ standardní (sazba 24,8 %)
+Print #3, "      <pvpoj:pojistneZamestnavateleA>" & SafeTrim(M10024) & "</pvpoj:pojistneZamestnavateleA>" ' Výše pojistného kategorie A
+If Val(SafeTrim(M10025)) > 0 Or Val(SafeTrim(M10023)) + Val(SafeTrim(M10026)) + Val(SafeTrim(M10483)) = 0 Then: Print #3, "      <pvpoj:zakladZamestnavateleB>" & SafeTrim(M10025) & "</pvpoj:zakladZamestnavateleB>" ' Základ záchranáři/členové HZS
+If Val(SafeTrim(M10026)) > 0 Then: Print #3, "      <pvpoj:pojistneZamestnavateleB>" & SafeTrim(M10026) & "</pvpoj:pojistneZamestnavateleB>" ' Výše pojistného kategorie B (sazba 29,8 %)
+If Val(SafeTrim(M10483)) > 0 Or Val(SafeTrim(M10023)) + Val(SafeTrim(M10026)) + Val(SafeTrim(M10483)) = 0 Then: Print #3, "      <pvpoj:zakladZamestnavateleC>" & SafeTrim(M10483) & "</pvpoj:zakladZamestnavateleC>" ' Základ riziková práce
+If Val(SafeTrim(M10484)) > 0 Then: Print #3, "      <pvpoj:pojistneZamestnavateleC>" & SafeTrim(M10484) & "</pvpoj:pojistneZamestnavateleC>" ' Výše pojistného kategorie C (sazba 26,8 %+)
 
 Print #3, "      <pvpoj:pojistneZamestnavateleCelkem>" & "0" & "</pvpoj:pojistneZamestnavateleCelkem>" ' Součet A + B + C
 Print #3, "      <pvpoj:pojistneZamestnance>" & "0" & "</pvpoj:pojistneZamestnance>" ' Úhrn sraženého pojistného ZC (sazba 7,1 %)
@@ -5040,8 +5059,9 @@ If formTag <> "odlozenyPrijem" Then: Print #3, "      <form:" & formTag & ">"
 If formTag = "odlozenyPrijem" Then
     ' ID 10548: Typ Odloženého příjmu (1-bonusy, 2,3-náhrady neplatné výpovědi, 4-RZD).
     M10477 = "0": M10286 = "0"
-  '  Print #3, "        <form:typ>" & SafeTrim(M10548) & "</form:typ>"
     Print #3, "      <form:odlozenyPrijem>"
+    Print #3, "        <form:typ>" & SafeTrim(M10548) & "</form:typ>"
+       
 End If
 
 ' 4.1 IDENTIFIKACE OSOBY (Sequence: Identifikace -> SDZ -> Pojištění)
@@ -5055,7 +5075,7 @@ Else ' Varianta 1/A1: Neztotožněné osoby (v manuálním šetření)
     Print #3, "          <form:jmeno>" & SafeTrim(M10054) & "</form:jmeno>" ' Jméno v nezkrácené podobě
     Print #3, "          <form:datumNarozeni>" & SafeTrim(M10056) & "</form:datumNarozeni>" ' Formát D.M.RRRR
     Print #3, "          <form:datumNastupu>" & SafeTrim(M10223) & "</form:datumNastupu>" ' Datum skutečného nástupu
-    Print #3, "          <form:druhCinnosti>" & SafeTrim(M10239) & "</form:druhCinnosti>" ' Kód 1-9, A-ZC
+     If SafeTrim(M10239) <> "" And formTag <> "odlozenyPrijem" Then: Print #3, "          <form:druhCinnosti>" & SafeTrim(M10239) & "</form:druhCinnosti>" ' Kód 1-9, A-ZC
 End If
 ' ID 10502: Bližší určení PPV. Vyžadováno u specifických skupin (soudci, poslanci, vězni).
 'If SafeTrim(M10502) <> "" Then
@@ -5063,12 +5083,13 @@ End If
 'End If
 Print #3, "        </form:identifikace>"
     If formTag = "odlozenyPrijem" Then: GoTo odlozPrijem
-
 ' 4.2 SOUHRNNÁ DATA ZAMĚSTNANCE (SDZ) - Pouze pro Primární PPV
 ' Obsahuje daně a součty za všechna zaměstnání osoby u téhož plátce.
 ' If M10495 = False Then: a = a + 1: txt(a) = " Má vedlejší pracovní poměr - " + O(269)
  If M10495 = True And Val(SafeTrim(M10286)) > 0 Then
-    Print #3, "        <form:souhrnDataZec>"
+
+     Print #3, "        <form:souhrnDataZec>"
+'  MsgBox (M10344)
 
     ' --- PŘÍJMY SDZ ---
     Print #3, "          <form:prijmy>"
@@ -5080,6 +5101,7 @@ Print #3, "        </form:identifikace>"
     End If
     ' Zero Suppression: Osvobozené příjmy (§ 6 odst. 9 ZDP) a rozpis příspěvků
     If Val(SafeTrim(M10289)) > 0 Then
+
         Print #3, "            <form:osvobozenoCelkem>" & SafeTrim(M10289) & "</form:osvobozenoCelkem>"
         ' --- ROZPAD PŘÍSPĚVKŮ NA STÁŘÍ (ID 10417, 10292-10296, 10418) ---
         Print #3, "            <form:prispevekZamestnavatele>"
@@ -5099,7 +5121,7 @@ Print #3, "        </form:identifikace>"
     ' --- ZÁLOHOVÁ DAŇ SDZ ---
    If M10495 = True And Val(SafeTrim(M10309)) = 0 Then
     Print #3, "          <form:zalohaNaDan>"
-    If SafeTrim(M10297) <> "0" And SafeTrim(M10297) <> "" Then: Print #3, "            <form:zakladDane>" & SafeTrim(M10297) & "</form:zakladDane>" ' Úhrn příjmů ze záv. činnosti (§ 5 odst. 4 ZDP)
+    Print #3, "            <form:zakladDane>" & SafeTrim(M10297) & "</form:zakladDane>" ' Úhrn příjmů ze záv. činnosti (§ 5 odst. 4 ZDP)
     Print #3, "            <form:vypoctenaZaloha>" & SafeTrim(M10298) & "</form:vypoctenaZaloha>" ' Daň ze základu před slevami
     Print #3, "            <form:danZalohaPoSleve>" & SafeTrim(M10305) & "</form:danZalohaPoSleve>" ' Skutečně sražená záloha
     If SafeTrim(M10306) <> "0" And SafeTrim(M10306) <> "" Then: Print #3, "            <form:danBonus>" & SafeTrim(M10306) & "</form:danBonus>" ' Vyplacený daňový bonus
@@ -5188,7 +5210,7 @@ Print #3, "        </form:identifikace>"
 
     ' --- ROČNÍ ÚHRNY / RZD SDZ (Položky uplatňované pouze v hlášení 01-03) ---
     ' Slouží pro podklady k daňovému přiznání a výsledky ročního zúčtování.
-    If M10010 = 1 Then
+    If M10010 <= 2 Then
         Print #3, "          <form:rocniUhrny>"
          If M10010 = 1 Then: Print #3, "            <form:prijemSrazkDanZvlSazba>" & SafeTrim(M10311) & "</form:prijemSrazkDanZvlSazba>" ' Příjmy podléhající srážkové dani za rok
          If M10010 = 1 Then: Print #3, "            <form:danSrazenaZvlSazba>" & SafeTrim(M10312) & "</form:danSrazenaZvlSazba>" ' Srážková daň za rok
@@ -5196,11 +5218,13 @@ Print #3, "        </form:identifikace>"
          If M10010 = 1 Then: Print #3, "            <form:prijemZdanitelnyDoplatek>" & SafeTrim(M10316) & "</form:prijemZdanitelnyDoplatek>" ' Doplatky příjmů z min. období
          If M10010 = 1 Then: Print #3, "            <form:zalohaPrijmy>" & SafeTrim(M10317) & "</form:zalohaPrijmy>" ' Sražené zálohy za rok
          If M10010 = 1 Then: Print #3, "            <form:zalohaDoplatky>" & SafeTrim(M10318) & "</form:zalohaDoplatky>" ' Sražené zálohy z doplatků
-         If M10010 = 1 Then: Print #3, "            <form:rocniZuctovaniZadost>" & IIf(M10319, "true", "false") & "</form:rocniZuctovaniZadost>" ' Zaměstnanec požádal o RZD
-        Print #3, "            <form:rocniZuctovaniProvedeno>" & IIf(M10320, "true", "false") & "</form:rocniZuctovaniProvedeno>" ' RZD bylo provedeno
-        Print #3, "          </form:rocniUhrny>"
+         Print #3, "            <form:rocniZuctovaniZadost>" & IIf(M10319, "true", "false") & "</form:rocniZuctovaniZadost>" ' Zaměstnanec požádal o RZD
+         Print #3, "            <form:rocniZuctovaniProvedeno>" & IIf(M10320, "true", "false") & "</form:rocniZuctovaniProvedeno>" ' RZD bylo provedeno
+
         ' --- VÝSLEDEK RZD (Sequence s detaily slev na partnera a děti v RZD) ---
+    
         If M10320 = True Then
+         
             Print #3, "            <form:vysledekRocnihoZuctovani>"
             ' ID 10321: Celkový přeplatek/doplatek z RZD (může být záporný).
             Print #3, "              <form:preplatekRok>" & SafeTrim(M10321) & "</form:preplatekRok>"
@@ -5208,6 +5232,8 @@ Print #3, "        </form:identifikace>"
             Print #3, "              <form:danBonusPreplatekRok>" & SafeTrim(M10323) & "</form:danBonusPreplatekRok>" ' Doplatek bonusu z RZD
             ' ID 10420: Uplatněna sleva na manželku/manžela v RZD (Příznak).
             Print #3, "              <form:uplatnenaSlevaNaPartnera>" & IIf(M10420, "true", "false") & "</form:uplatnenaSlevaNaPartnera>"
+            Print #3, "            <form:uplatnenoZvyhodneniNaDeti>" & IIf(M10454, "true", "false") & "</form:uplatnenoZvyhodneniNaDeti>" ' Celkový úhrn zvýhodnění na děti
+
             Print #3, "            </form:vysledekRocnihoZuctovani>"
             ' Rozpis slevy na partnera (Cyklicky 1 až N partnerů v roce)
             If M10420 = True Then
@@ -5257,7 +5283,7 @@ Print #3, "        </form:identifikace>"
               
             End If
             ' Ostatní vyživující osoby v rámci RZD
-            Print #3, "              <form:vyzivujeJinaOsoba>" & IIf(M10455, "true", "false") & "</form:vyzivujeJinaOsoba>"
+         '   Print #3, "              <form:vyzivujeJinaOsoba>" & IIf(M10455, "true", "false") & "</form:vyzivujeJinaOsoba>"
             If M10455 = True Then
                 Print #3, "              <form:jineOsoby>"
                 For b = 1 To PocetRzdSpolOsob
@@ -5302,16 +5328,17 @@ Print #3, "        </form:identifikace>"
             End If
          '   Print #3, "            </form:vysledekRocnihoZuctovani>"
         End If
+                Print #3, "          </form:rocniUhrny>"
     End If ' If M10010 = 1 Then
 
     ' --- ČISTÝ PŘÍJEM A SRÁŽKY SDZ ---
+    
  If SpecSkupina = "0" Then
    If formTag <> "jinyPrijem" Then
  
   Print #3, "          <form:mzdaCista>"
     ' ID 10344: Čistý příjem (po odpočtu daní a pojistného). Mandatorní nula.
     Print #3, "            <form:mzdaCista>" & SafeTrim(M10344) & "</form:mzdaCista>"
-    
     ' ID 10116: Příznak exekucí/srážek nařízených soudem nebo konkursu.
     Print #3, "            <form:srazkyZeMzdyEvidovany>" & IIf(M10116, "true", "false") & "</form:srazkyZeMzdyEvidovany>"
 
@@ -5341,8 +5368,10 @@ Print #3, "        </form:identifikace>"
 End If ' SpecSkupina = "0" Then
       ' --- ZDRAVOTNÍ POJIŠTĚNÍ SDZ (Mandatorní od v1.4.2) ---
     ' Zdravotní pojištění se neuvádí v PVPOJ, ale povinně zde v SDZ.
+   
  If formTag <> "jinyPrijem" Then
   If SpecSkupina = "0" Then
+
     Print #3, "          <form:zdravPojZamestnavatel>"
     Print #3, "            <form:zdravotniPojisteni>" & SafeTrim(M10482) & "</form:zdravotniPojisteni>" ' Odvod ZL za ZC (9 %)
     Print #3, "          </form:zdravPojZamestnavatel>"
@@ -5364,7 +5393,7 @@ If formTag = "odlozenyPrijem" Then 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     
     Print #3, "          <form:rocniUhrny>"
     
-        Print #3, "            <form:rocniZuctovaniZadost>" & IIf(M10319, "true", "false") & "</form:rocniZuctovaniZadost>" ' Zaměstnanec požádal o RZD
+        If Trim(P(108)) = "Ano" Then: Print #3, "            <form:rocniZuctovaniZadost>" & IIf(M10319, "true", "false") & "</form:rocniZuctovaniZadost>" ' Zaměstnanec požádal o RZD
         Print #3, "            <form:rocniZuctovaniProvedeno>" & IIf(M10320, "true", "false") & "</form:rocniZuctovaniProvedeno>" ' RZD bylo provedeno
              Print #3, "            <form:vysledekRocnihoZuctovani>"
             ' ID 10321: Celkový přeplatek/doplatek z RZD (může být záporný).
@@ -5382,6 +5411,7 @@ If formTag = "odlozenyPrijem" Then 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
                Print #3, "            <form:mzdaCista>" & SafeTrim(M10344) & "</form:mzdaCista>"
                Print #3, "            <form:srazkyZeMzdyEvidovany>" & IIf(M10116, "true", "false") & "</form:srazkyZeMzdyEvidovany>"
             Print #3, "          </form:mzdaCista>"
+           
        Print #3, "          <form:zdravPojZamestnavatel>"
        Print #3, "            <form:zdravotniPojisteni>" & SafeTrim(M10482) & "</form:zdravotniPojisteni>" ' Odvod ZL za ZC (9 %)
        Print #3, "          </form:zdravPojZamestnavatel>"
@@ -5390,86 +5420,42 @@ If formTag = "odlozenyPrijem" Then 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
        Print #3, "          </form:zdravPojZamestnanec>"
        Print #3, "        </form:souhrnDataZec>"
 
-       Print #3, "         <form:pojisteni>"
+       Print #3, "    <form:pojisteni>"
            Print #3, "          <form:vymerovaciZaklad>"
            Print #3, "            <form:castkaOdvodPojistneho>" & SafeTrim(M10477) & "</form:castkaOdvodPojistneho>"
+           Print #3, "            <form:prijemNepojistenaCinnost>" & SafeTrim(M10476) & "</form:prijemNepojistenaCinnost>"
            Print #3, "          </form:vymerovaciZaklad>"
-       Print #3, "         </form:pojisteni>"
        
-       
+       Print #3, "      <form:eldpObdobi>"
+       Print #3, "       <form:obdobi>"
+       Print #3, "         <form:mesic>" & SafeTrim(Str(SysMes)) & "</form:mesic>"
+       Print #3, "         <form:rok>" & SafeTrim(Str(SysRok)) & "</form:rok>"
+       Print #3, "          <form:eldpSeznam>"
+       Print #3, "            <form:eldp>"
+       Print #3, "              <form:kod>" & SafeTrim(O(227)) & "</form:kod>"
+       Print #3, "              <form:pocetDnu>" & "0" & "</form:pocetDnu>" ' Kalendářní dny trvání pojištění
+       Print #3, "              <form:vymerovaciZaklad>" & "0" & "</form:vymerovaciZaklad>"
+       Print #3, "            </form:eldp>"
+       Print #3, "          </form:eldpSeznam>"
+       Print #3, "       </form:obdobi>"
+       Print #3, "      </form:eldpObdobi>"
+
+       Print #3, "          <form:pojisteniZamestnanec>"
+' ID 10370: Sražené pojistné ZC (7,1 % z vyměřovacího základu 10477).
+       Print #3, "            <form:socialniPojisteni>" & "0" & "</form:socialniPojisteni>"
+       Print #3, "          </form:pojisteniZamestnanec>"
+       Print #3, "          <form:pojisteniZamestnavatel>"
+' ID 10481: Odvedené pojistné ZL za ZC (před slevou).
+       Print #3, "            <form:socialniPojisteni>" & "0" & "</form:socialniPojisteni>"
+       Print #3, "          </form:pojisteniZamestnavatel>"
+       Print #3, "    </form:pojisteni>"
+        
        Print #3, "        <form:prijem>"
          Print #3, "          <form:dan>"
           Print #3, "            <form:zakladDane>" & SafeTrim(M10535) & "</form:zakladDane>"
          Print #3, "          </form:dan>"
        Print #3, "        </form:prijem>"
     Print #3, "      </form:odlozenyPrijem>"
-    Print #3, "</formularOsoby>"
-   Exit Sub
-
-       
-       Print #3, "          <form:trvani>"
-          If Mid(P(60), 1, 10) <> "00.00.0000" And Trim(P(60)) <> "" Then: SocELDPOd = CDate(Mid(P(60), 1, 10)):
-          If Mid(P(429), 1, 10) <> "00.00.0000" And Trim(P(429)) <> "" Then: SocELDPDo = CDate(Mid(P(429), 1, 10))
-           
-           If SocELDPOd < SocELDPDo And (Month(SocELDPOd) <> Month(SocELDPDo) Or Year(SocELDPOd) <> Year(SocELDPDo)) Then: SocELDPOd = Datum(1, Month(SocELDPDo), Year(SocELDPDo))
-          If Year(SocELDPOd) = Year(SocELDPDo) And Month(SocELDPOd) = Month(SocELDPOd) And Day(SocELDPOd) > 1 Then: SocELDPOd = Datum(Day(CDate(Mid(P(60), 1, 10))), Month(SocELDPDo), Year(SocELDPDo))
-            M10354 = DateStr(SocELDPOd)
-            dtt = Split(M10354, ".")
-           If UBound(dtt) = 2 Then: M10354 = Right("0000" & Trim(dtt(2)), 4) & "-" & Right("00" & Trim(dtt(1)), 2) & "-" & Right("00" & Trim(dtt(0)), 2)
-            If SafeTrim(M10354) <> "" And SafeTrim(M10354) <> "00.00.0000" Then: Print #3, "            <form:pojisteniOd>" & SafeTrim(M10354) & "</form:pojisteniOd>" ' Počátek pojištění v měsíci
-            If SafeTrim(M10355) <> "" And SafeTrim(M10355) <> "00.00.0000" Then: Print #3, "            <form:pojisteniDo>" & SafeTrim(M10355) & "</form:pojisteniDo>" ' Konec pojištění v měsíci
-       Print #3, "          </form:trvani>"
-   
-       Print #3, "          <form:eldpSeznam>"
-       Print #3, "            <form:eldp>"
-    
-       If M(3) = 1 Then: Print #3, "              <form:kod>" & SafeTrim(O(227)) & "</form:kod>"
-       Print #3, "              <form:pocetDnu>" & "0" & "</form:pocetDnu>" ' Kalendářní dny trvání pojištění
-       Print #3, "            </form:eldp>"
-       Print #3, "          </form:eldpSeznam>"
-       Print #3, "          <form:slevaZamestnavatele>"
-       Print #3, "            <form:slevaZamestnavateleEvidovana>" & IIf(M10372, "true", "false") & "</form:slevaZamestnavateleEvidovana>"
-       Print #3, "          </form:slevaZamestnavatele>"
-       Print #3, "      </form:pojisteni>"
-       
-    Print #3, "        <form:vykonavanaPozice>"
-    ' Místo výkonu práce (Převážné území pro statistiky ČSÚ)
-    Print #3, "          <form:mistoVykonuPrace>"
-    Print #3, "            <form:obec>" & SafeTrim(M10229) & "</form:obec>" ' Název obce
-    Print #3, "            <form:kodObce>" & SafeTrim(M10230) & "</form:kodObce>" ' Kód obce dle ČSÚ
-    Print #3, "            <form:kodStatu>" & SafeTrim(M10231) & "</form:kodStatu>" ' Kód státu dle číselníku
-    Print #3, "          </form:mistoVykonuPrace>"
-    Print #3, "          <form:uplatnujiPrispevekApz>" & IIf(M10232, "true", "false") & "</form:uplatnujiPrispevekApz>" ' Žádost o příspěvek
-    Print #3, "          <form:funkcniPozitky>" & IIf(M10247, "true", "false") & "</form:funkcniPozitky>"
-    Print #3, "          <form:docasnePrideleniEvidovano>" & IIf(M10251, "true", "false") & "</form:docasnePrideleniEvidovano>"
-      
-
-    Print #3, "          <form:fondPracovniDoby>"
-    Print #3, "            <form:stanovenyFond>" & SafeTrim(M10259) & "</form:stanovenyFond>"
-    Print #3, "            <form:sjednanyFond>" & SafeTrim(M10260) & "</form:sjednanyFond>"
-    Print #3, "            <form:stanovenaTydenniDoba>" & SafeTrim(M10261) & "</form:stanovenaTydenniDoba>"
-    Print #3, "         </form:fondPracovniDoby>"
-    Print #3, "        </form:vykonavanaPozice>"
-
-    Print #3, "        <form:prubehZamestnani>"
-    Print #3, "          <form:odpracovaneDny>"
-        M10265 = Trim(Str(Abs(DateDiff("d", SocELDPOd, SocELDPDo) + 1)))
-    Print #3, "            <form:dnyEvidencniStav>" & SafeTrim(M10265) & "</form:dnyEvidencniStav>"
-    Print #3, "          </form:odpracovaneDny>"
-    Print #3, "          <form:odpracovaneHodiny>"
-    Print #3, "            <form:pocet>" & SafeTrim(M10268) & "</form:pocet>" ' Celkový úhrn odpracovaných/odsloužených hodin.
-    Print #3, "          </form:odpracovaneHodiny>"
-    Print #3, "        </form:prubehZamestnani>"
-
- 
-  
-    Print #3, "        <form:mzda>"
-    Print #3, "          <form:mzdaZuctovana>" & SafeTrim(M10328) & "</form:mzdaZuctovana>"
-    Print #3, "          <form:vydelek>"
-    Print #3, "            <form:vydelekPrumernyHod>" & SafeTrim(M10345) & "</form:vydelekPrumernyHod>"
-    Print #3, "          </form:vydelek>"
-    Print #3, "        </form:mzda>"
-    Print #3, "      </form:bezPriznaku>"
     Print #3, "</formularOsoby>"
    Exit Sub
 End If
@@ -5482,8 +5468,8 @@ If M10495 = True And Val(SafeTrim(M10286)) = 0 Then
                Print #3, "          </form:prijmy>"
                      ' ID 10419: Příznak podepsaného Prohlášení poplatníka (růžový tiskopis).
         Print #3, "          <form:prohlaseniPoplatnika>" & IIf(M10419, "true", "false") & "</form:prohlaseniPoplatnika>"
-       
-   If formTag <> "jinyPrijem" And Val(SafeTrim(M10482)) = 0 Then
+     
+   If (formTag <> "jinyPrijem" And Val(SafeTrim(M10482)) = 0) Or M(90) = M(468) Or M(61) > 0 Then
        
            Print #3, "          <form:mzdaCista>"
                      ' ID 10344: Čistý příjem (po odpočtu daní a pojistného). Mandatorní nula.
@@ -5570,11 +5556,18 @@ For e = 1 To PocetELDP
     ' ID 10240: Kód ELDP (např. 1++, 0, 2, atd. dle číselníku ČSSZ).
      If M(3) = 1 Then: Print #3, "              <form:kod>" & SafeTrim(M10240(e)) & "</form:kod>"
       If Mid(O(340), 1, 10) <> Mid(P(429), 1, 10) Then: a = a + 1: txt(a) = "Zkontrolujte datum výstupu O340 a Datum  pojištění P429 v okně P159"
-      
+    
+
       If M(3) = 1 Then
-        If SafeTrim(M10241(e)) <> "" Then: Print #3, "              <form:platnostOd>" & SafeTrim(M10241(e)) & "</form:platnostOd>" ' Platnost kódu od
+      '  If Trim(ZOsCislo) = "1043" Then: MsgBox (M10241(e) & "  " & M10242(e))
+           
+           
+        If SafeTrim(M10241(e)) <> "" Then: Print #3, "              <form:platnostOd>" & SafeTrim(M10241(e)) & "</form:platnostOd>":  ' Platnost kódu od
         If Len(SafeTrim(M10241(e))) <> 10 Then: a = a + 1: txt(a) = "Nesprávný formát datumu P60 Přihlášen na soc. poj. v okně P159"
         If SafeTrim(M10242(e)) <> "" Then: Print #3, "              <form:platnostDo>" & SafeTrim(M10242(e)) & "</form:platnostDo>" ' Platnost kódu do
+      
+      '  If Trim(ZOsCislo) = "1043" Then: MsgBox (M10241(e) & " x " & M10242(e))
+     '   End If
       End If
    
 
@@ -6054,6 +6047,7 @@ ShellExecute FrmOdd.hwnd, "Open", "https://www.salary.cz/jmhz2026/knihovna-jmhz/
 
 End Sub
 
+
 Private Sub Command3_Click()
 FrmJMHZ.BackColor = &H80C0FF
 Label1.BackColor = &H80C0FF
@@ -6286,7 +6280,7 @@ Private Sub Command9_Click()
 CoPoslat = 1:
  'Command81.Caption = "Oprava měsíčních dat"
 Neuvol = 0
- Nacti_F10001
+ 'Nacti_F10001
 
  If ResultText(2) = "JedenZam" Then
  Option2(1) = 1
@@ -6435,7 +6429,7 @@ Combo1 = mesicStr(SysMes)
 Combo2 = SysRok
 
         PathDta = PathAdres + "\" + "U" & Format(Datum(1, SysMes, SysRok), "yyyymm") & ".mdb" ' cesta k datům pam, osobní
-
+Nacti_F10001
 b = 1: Cast = 0
 'If NahrajOsPam(ZOsCislo, SysMes, SysRok) = 1 Then:
  NactiFirmu
@@ -6446,23 +6440,24 @@ b = 1: Cast = 0
  DPPHranice = ResultCislo(8)
  ProcSocOrg = ResultCislo(2)
  CMRMax = ResultCislo(24)
-' Check6.Visible = False
+ Check6.Visible = False
  If HesloRez = 100 Then: Check6.Visible = True:
  If Mid(LicenceCis, 11, 8) = IcoZitkova Then: Check6.Visible = False
  Check6 = 0
- If Mid(LicenceCis, 11, 8) = "49905431" Then: Check6 = 1
+' If Mid(LicenceCis, 11, 8) = "49905431" Then: Check6 = 1
  
 CoPoslat = 1
  Command81.Caption = "Oprava měsíčních dat"
 Neuvol = 0: Uvol = 0
 If ResultText(2) = "" Then
+  Check6.Visible = True
     Command22.Visible = False
     Text5.Visible = False
     Command9.Caption = "Vytvoř XML Měsíční hlášení"
     Command10.Caption = "Vytvoř hromadné XML změny (Akce A3) v registraci zaměstnanců (jednorázová akce)": ' Command10.Visible = False
     Command11.Caption = "Registr zaměstnavatelů REGZELDOPL (POUZE DUBEN 2026)"
     FrmJMHZ.BackColor = &HC0C000
-   ' Command1.Visible = True
+    Frame4.Visible = True
     Label10.Visible = False: Label9.Visible = False: Command6.Visible = False: Command7.Visible = False: Command81.Visible = False
     Command18(1).Visible = True: Command18(2).Visible = True: Command4.Visible = False
     Check1.Visible = False: Check2.Visible = False: Check3.Visible = False: Check4.Visible = False: Check5.Visible = False
@@ -6475,11 +6470,13 @@ If ResultText(2) = "" Then
     'Label6.BackColor = &HC0C000:
     'Label7.BackColor = &HC0C000:
     Label1.ForeColor = &H8000000B
-    Nacti_F10001
+    
 Else
     Command22.Visible = True
+    Check6.Visible = False
     Text5.Visible = True
-
+    Command10.Visible = True
+    Frame4.Visible = False
     Command9.Caption = "Měsíční hlášení"
     Command10.Caption = "Registrace zaměstnanců (REGZEC)": Command15.Visible = False
     Command11.Caption = "Registrace zaměstnavatelů (REGZEL)"
@@ -6497,8 +6494,6 @@ Else
     Frame8.Visible = False: Frame9.Visible = False
     Label8.Caption = " " + Trim(ZOsCislo) + " " + Trim(ZJmeno) + " " + Trim(ZPrijmeni)
     Option1(1) = "1"
-    Text3 = P(642)
-    Text4 = P(643)
 End If
  Frame17.Height = 6135
  Frame17.Left = 5280
@@ -6611,33 +6606,7 @@ Private Sub SloucitXML()
            If FileExist(FVystup) Then: Kill FVystup
  
 End Sub
-Public Function CreateGUID() As String
-    Dim udtGuid As GUID
-    Dim strGuid As String
-    Dim lResult As Long
 
-    ' Vytvoření GUID
-    lResult = CoCreateGuid(udtGuid)
-    If lResult <> 0 Then
-        CreateGUID = ""
-        Exit Function
-    End If
-
-    ' Příprava bufferu pro GUID jako string
-    strGuid = String$(39, vbNullChar)
-    lResult = StringFromGUID2(udtGuid, StrPtr(strGuid), 39)
-
-    If lResult > 0 Then
-        CreateGUID = Left$(strGuid, lResult - 1)
-        CreateGUID = Replace(CreateGUID, "{", "")
-        CreateGUID = Replace(CreateGUID, "}", "")
-
-
-        'MsgBox CreateGUID
-    Else
-        CreateGUID = ""
-    End If
-End Function
 Public Sub JedenZamestnanec()
 
            If CoPoslat = 1 And Cast = 0 Then: NaplnZamestnance
@@ -6785,6 +6754,22 @@ If Check5.Value = 1 Then: Check1.Value = 0: Check2.Value = 0: Check3.Value = 0: 
 
 End Sub
 
+Private Sub Check6_Click()
+If Check6.Value = 1 Then: Frame8.Visible = True
+If Check6.Value = 0 Then: Frame8.Visible = False
+End Sub
+
+Private Sub Check7_Click()
+Check8.Value = 0
+Uloz_F10001A
+End Sub
+
+Private Sub Check8_Click()
+Check7.Value = 0
+Uloz_F10001A
+
+End Sub
+
 Private Sub Image1_Click()
 Frame17.Visible = False
 End Sub
@@ -6804,6 +6789,7 @@ i = i + 1: T(i) = String(156, "*")
 For op = 1 To 3
  M10375(op) = 0: M10245(op) = "0": M10356(op) = "0": M10357(op) = "0": M10358(op) = "0": M10359(op) = "0": M10360(op) = "0": M10362(op) = "0": M10536(op) = "0": M10366(op) = "0": M10473(op) = "0": M10474(op) = "0": M10475(op) = "0"
 Next op
+
 If M(7) = 0 Then: i = i + 1: T(i) = "Zaměstnanec (" + O(320) + ")není pojištěn pro tento měsíc! Pokud má být pojištěn zkontrolujte v PaM okno P159 Registr zaměstnanců provádí"
 If M(7) = 0 Then: M10356(1) = "0": PocetELDP = 1: Exit Sub
 
@@ -6814,7 +6800,7 @@ If Mid(P(429), 1, 10) <> "00.00.0000" And Trim(P(429)) <> "" Then: SocELDPDo = C
 If SocELDPOd < Datum(1, SysMes, SysRok) Then: SocELDPOd = Datum(1, SysMes, SysRok)
 If SocELDPDo < Datum(PoslednihoS, SysMes, SysRok) And Mid(P(429), 1, 10) <> "00.00.0000" Then: SocELDPDo = Datum(Val(Mid(P(429), 1, 2)), SysMes, SysRok)
 If Mid(P(429), 1, 10) = "00.00.0000" Or SocELDPDo > Datum(PoslednihoS, SysMes, SysRok) Then: SocELDPDo = Datum(PoslednihoS, SysMes, SysRok)
-'MsgBox (SocELDPOd & "   " & SocELDPDo)
+
     For b = 1 To 3: nn(b) = 0: aa(b) = 0: PPM(b) = 0: DMD(b) = 0: OCR(b) = 0: OCRN(b) = 0: cc(b) = 0: xx(b) = 0: DNPnahr(b) = 0: Next b
       
      If Mid(O(287), 2, 1) = "P" Or Mid(O(287), 2, 1) = "M" Or Mid(O(287), 2, 1) = "N" Then: PocetELDP = 3: Kod(3) = O(287)
@@ -6830,6 +6816,7 @@ If Mid(P(429), 1, 10) = "00.00.0000" Or SocELDPDo > Datum(PoslednihoS, SysMes, S
      If Mid(O(249), 1, 10) <> "00.00.0000" And Trim(O(249)) <> "" Then: SocELDPDo3(2) = CDate(Mid(O(249), 1, 10)): PocetELDP = 2
      If Mid(O(288), 1, 10) <> "00.00.0000" And Trim(O(288)) <> "" Then: SocELDPOd3(3) = CDate(Mid(O(288), 1, 10)): PocetELDP = 3
      If Mid(O(289), 1, 10) <> "00.00.0000" And Trim(O(289)) <> "" Then: SocELDPDo3(3) = CDate(Mid(O(289), 1, 10)): PocetELDP = 3
+ 
   PocetELDP = 0
   If Trim(O(227)) <> "" Then: PocetELDP = 1
   If Trim(O(247)) <> "" Then: PocetELDP = 2
@@ -7061,45 +7048,6 @@ HromA1 = 0
 Command18(1).Visible = False
 
 End Sub
-Public Sub Uloz_F10001()
-
-    Dim db As DAO.Database
-    Dim Rs As DAO.Recordset
-    Dim cesta As String
-
-
-
-    cesta = PathAdres & "\Nastav2.mdb"
-    Set db = DBEngine.OpenDatabase(cesta, False, False, ";PWD=Salary21")
-
-    ' Otevřeme celou tabulku Firma3
-    Set Rs = db.OpenRecordset("SELECT * FROM TAB1", dbOpenDynaset)
-
-    ' Pokud tabulka nemá žádný řádek › vytvoříme první
-    If Rs.RecordCount = 0 Then
-        Rs.AddNew
-    Else
-        Rs.Edit
-    End If
-   
-    If SysMes = 1 Then: Rs!D001 = "R"
-    If SysMes = 2 Then: Rs!D002 = "R"
-    If SysMes = 3 Then: Rs!D003 = "R"
-    If SysMes = 4 Then: Rs!D004 = "R"
-    If SysMes = 5 Then: Rs!D005 = "R"
-    If SysMes = 6 Then: Rs!D006 = "R"
-    If SysMes = 7 Then: Rs!D007 = "R"
-    If SysMes = 8 Then: Rs!D008 = "R"
-    If SysMes = 9 Then: Rs!D009 = "R"
-    If SysMes = 10 Then: Rs!D010 = "R"
-    If SysMes = 11 Then: Rs!D011 = "R"
-    If SysMes = 12 Then: Rs!D012 = "R"
-    Rs!D013 = M10001
-    Text3 = M10001
-    Rs.Update
-    Rs.Close
-    db.Close
-End Sub
 Public Function Nacti_F10001() As Variant
 
     Dim db As DAO.Database
@@ -7154,6 +7102,11 @@ cesta = PathAdres & "\Nastav2.mdb"
   End If
   Set Rs = db.OpenRecordset("SELECT D013 FROM TAB1", dbOpenSnapshot)
   Text3 = Rs!D013
+  Set Rs = db.OpenRecordset("SELECT D014 FROM TAB1", dbOpenSnapshot)
+  
+  If Rs!D014 = "0" Then: Check7.Value = 0: Check8.Value = 0
+  If Rs!D014 = "1" Then: Check7.Value = 1: Check8.Value = 0
+  If Rs!D014 = "2" Then: Check7.Value = 0: Check8.Value = 1
   
     Rs.Close
     db.Close
@@ -7426,7 +7379,7 @@ End If
 
  If M10239 <> "14" And M10239 <> "Q" Then
     ' 3.1 <prof> Profese a vzdělání
-    Print #5, "      <prof clas=" & U & SafeTrim(M10234) & U & IIf(bCizinec And M10248 <> "", " edu=" & U & SafeTrim(M10248) & U, "") & "/>"
+    Print #5, "      <prof class=" & U & SafeTrim(M10234) & U & IIf(bCizinec And M10248 <> "", " edu=" & U & SafeTrim(M10248) & U, "") & "/>"
      If SafeTrim(M10234) = "" Then: a = a + 1: txt(a) = "Není vyplněn KZAM v Osobním odd. O051"
     ' 3.2 <position> Pozice a vedoucí zaměstnanec ("A"/"N")
     Print #5, "      <position name=" & U & SafeTrim(M10235) & U & " lead=" & U & SafeTrim(M10238) & U & "/>"
@@ -7924,7 +7877,7 @@ Private Sub Command22_Click()
 Dim HledejGUID As String
 Dim RsHled As Recordset
       
-   If Len(Trim(Text5)) <> 36 And Trim(Text5) <> "" Then: MsgBox ("GUID má chybný počet znaků"): Exit Sub
+   If Len(Trim(Text5)) <> 36 And Trim(Text5) <> "" Then: MsgBox ("GUID má chybný počet znaků - " & Len(Trim(Text5))): Exit Sub
    If Trim(Text5) = "" Then: Exit Sub
       HledejGUID = Text5
           Set RsHled = DbUdaje.OpenRecordset("SELECT OsCislo From DataPaM WHERE  PoNapln = """ & HledejGUID & """ ")
@@ -7960,4 +7913,35 @@ Nenasel:
 Msg = "Guid zaměstnance neexistuje."
 MsgVykricnik
 End Sub
+Public Sub Uloz_F10001A()
 
+    Dim db As DAO.Database
+    Dim Rs As DAO.Recordset
+    Dim cesta As String
+    Dim g As String
+
+
+    cesta = PathAdres & "\Nastav2.mdb"
+    Set db = DBEngine.OpenDatabase(cesta, False, False, ";PWD=Salary21")
+
+    ' Otevřeme celou tabulku Firma3
+    Set Rs = db.OpenRecordset("SELECT * FROM TAB1", dbOpenDynaset)
+
+    ' Pokud tabulka nemá žádný řádek › vytvoříme první
+    If Rs.RecordCount = 0 Then
+        Rs.AddNew
+    Else
+        Rs.Edit
+    End If
+   
+g = "0"
+If Check7.Value = 1 Then: g = "1"
+If Check8.Value = 1 Then: g = "2": Rs!D013 = M10001
+
+    Rs!D014 = g
+   ' MsgBox (G)
+    
+    Rs.Update
+    Rs.Close
+    db.Close
+End Sub
